@@ -2,6 +2,10 @@ package static_overflow_project;
 
 import java.util.ArrayList;
 
+/*
+ * ./analyzeHeadless /home/ryan/code/cmpt_479/ ghidra_prac -process CWE121_Stack_Based_Buffer_Overflow__char_type_overrun_memcpy_01.out -postscript static_overflow_project.Analyzer
+ */
+
 // ./analyzeHeadless /home/ryan/code/cmpt_479/ ghidra_prac -process strings -postscript overflow_package.Analyzer
 import java.util.HashSet;
 
@@ -10,6 +14,8 @@ import ghidra.app.decompiler.DecompileOptions;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.address.*;
 import ghidra.program.model.symbol.*;
+import ghidra.program.flatapi.*;
+import ghidra.program.flatapi.FlatProgramAPI;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Listing;
 import ghidra.program.model.listing.Parameter;
@@ -26,6 +32,7 @@ public class Analyzer extends GhidraScript{
 	public static AddressFactory AddressFactory;
 	public static ReferenceManager ReferenceManager;
 	public static String ProgramName;
+	public static FlatProgramAPI FlatApi;
 	
 	private void decompilerSetup() {
 		decomp = new DecompInterface();
@@ -45,6 +52,7 @@ public class Analyzer extends GhidraScript{
 		AddressFactory = currentProgram.getAddressFactory();
 		ReferenceManager = currentProgram.getReferenceManager();
 		ProgramName = currentProgram.getName();
+		FlatApi = new FlatProgramAPI(currentProgram);
 	}
 
 	@Override
@@ -54,8 +62,10 @@ public class Analyzer extends GhidraScript{
 		HashSet<Sink> discoveredSinks;
 		
 		SinkHandler sinkHandler = new SinkHandler();
+		SourceHandler sourceHandler = new SourceHandler();
 		
 		discoveredSinks = sinkHandler.FindSinks();
+		
 		
 		System.out.println("Hello!");
 		
@@ -71,6 +81,9 @@ public class Analyzer extends GhidraScript{
 				System.out.print(", ");
 			}
 			System.out.println("");
+			
+			sourceHandler.GetSources(dis);
+			break;
 		}
 		
 	}
